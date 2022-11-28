@@ -1,2 +1,2 @@
-# laravelMS
-Microservice Laravel app 
+# ezKartAccService
+Account service 
