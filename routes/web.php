@@ -29,7 +29,12 @@ Route::get('/fetchUser', [AccountController::class, 'fetchUser']);
 
 Route::get('/fetchAllUsers', [AccountController::class, 'fetchAllUser']);
 
-Route::post('/generateOtp', [AccountController::class, 'generateUser']);
+Route::get('/verifyEmail/{userid}/{otp}', function ($userid, $otp) {
+
+    $accController = new AccountController();
+    $accController->validateUserAcc($userid, $otp);
+});
+
 
 
 

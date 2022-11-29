@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Services\OtpGeneration;
 use Bschmitt\Amqp\Facades\Amqp;
+use Illuminate\Support\Facades\DB;
+
 
 
 
@@ -13,11 +15,9 @@ use Bschmitt\Amqp\Facades\Amqp;
 class AccountController extends Controller
 {
 
-    private $otpgeneration;
 
-    public function __construct(OtpGeneration $otpgeneration)
+    public function __construct()
     {
-        $this->otpgeneration = $otpgeneration;
     }
 
 
@@ -25,6 +25,7 @@ class AccountController extends Controller
 
 
         $user = new User();
+        $otpGeneration = new OtpGeneration();
         $user-> name = $request->input('name');
         $user-> password = $request->input('password');
         $user-> email = $request->input('email');
@@ -33,7 +34,7 @@ class AccountController extends Controller
 
 
         if($status){
-            $opt = $this->otpgeneration->generateOtp($userID);
+            $opt = $otpGeneration->generateOtp($userID);
             $message = array('user' => $userID,
                              'otp' =>$opt,
                              'email' =>$request->input('email'));
@@ -47,7 +48,12 @@ class AccountController extends Controller
 
 
     function removeUser(Request $request){
+        $id = $request->input('id');
 
+        $user = DB::table('users')
+            ->where('id', $id);
+
+        $user->delete();
     }
 
     function updateUser(Request $request){
@@ -66,6 +72,28 @@ class AccountController extends Controller
     function passwordReset(Request $request){
 
         $id = $request->input('id');
+
+    }
+
+    function validateUserAcc($userId, $otp){
+
+        $user = DB::table('otps')
+            ->where('otp', $otp)
+            ->where('user_id', $userId)
+            ->where('type', 'activation')
+            ->where('otp_status', '0')
+            ->get();
+        if($user->count()==1){
+            DB::table('otps')
+                ->where('otp', $otp)
+                ->where('user_id', $userId)
+                ->update(['otp_status' => "1"]);
+
+            DB::table('users')
+                ->where('id', $userId)
+                ->update(['user_status' => "1", 'email_verified_at' =>date('Y-m-d H:i:s')]);
+
+        }
 
     }
 }
