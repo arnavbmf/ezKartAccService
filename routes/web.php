@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AuthController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +35,13 @@ Route::get('/verifyEmail/{userid}/{otp}', function ($userid, $otp) {
 
     $accController = new AccountController();
     $accController->validateUserAcc($userid, $otp);
+});
+
+
+Route::group(['middleware'=>'api', 'prefix'=>'auth'], function ($router){
+    Route::post('/register', [AccountController::class, 'createUser']);
+    Route::post('/login', [AuthController::class, 'login']);
+
 });
 
 

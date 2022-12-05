@@ -176,7 +176,8 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        Bschmitt\Amqp\AmqpServiceProvider::class
+        Bschmitt\Amqp\AmqpServiceProvider::class,
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
 
     ],
 
@@ -233,6 +234,10 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Amqp' => Bschmitt\Amqp\Facades\Amqp::class,
+        'JwtAuth' => Tymon\JWTAuth\Facades\JwtAuth::class,
+        'JwtAuthFactory' => Tymon\JWTAuth\Facades\JwtAuthFactory::class,
+
+
     ],
 
 ];

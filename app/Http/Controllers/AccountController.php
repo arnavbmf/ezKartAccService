@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+//use Dotenv\Validator;
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Services\OtpGeneration;
 use Bschmitt\Amqp\Facades\Amqp;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Validator;
 
 
 
@@ -23,29 +25,43 @@ class AccountController extends Controller
 
     function createUser(Request $request){
 
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|email|string',
+            'password' => 'required|string'
 
-        $user = new User();
-        $otpGeneration = new OtpGeneration();
-        $user-> name = $request->input('name');
-        $user-> password = $request->input('password');
-        $user-> email = $request->input('email');
-        $status = $user-> save();
-        $userID = $user->id;
+        ]);
 
-
-        if($status){
-            $opt = $otpGeneration->generateOtp($userID);
-            $message = array('user' => $userID,
-                             'otp' =>$opt,
-                             'email' =>$request->input('email'));
-
-
-            Amqp::publish('ezKartOtpVerification', json_encode($message), ['queue' => 'ezKartOtpVerification']);
+        if($validator->fails()){
+            return response()->json($validator->error()->toJson(), 422);
         }
-        return ["res"=>"1"];
+
+        $user = User::create(array_merge(
+            $validator->validated(),
+            ['password'=>bcrypt($request->input('password'))]
+        ));
+
+        if($user){
+            $otpGeneration = new OtpGeneration();
+            $opt = $otpGeneration->generateOtp($user->id);
+            $message = array('user' => $user->id,
+                'otp' =>$opt,
+                'email' =>$request->input('email'));
+            Amqp::publish('ezKartOtpVerification', json_encode($message), ['queue' => 'ezKartOtpVerification']);
+
+            return response()->json([
+                'message' =>'user successfully created',
+                'user' => $user
+            ], 200);
+        }
+
+        return response()->json([
+            'message' =>'Error! User not created',
+                 'user' => $user
+            ], 500);
+
+
     }
-
-
 
     function removeUser(Request $request){
         $id = $request->input('id');
@@ -66,7 +82,6 @@ class AccountController extends Controller
             ->where('id', $id)
             ->update(['user_status' => "3"]);
 
-
     }
 
     function passwordReset(Request $request){
@@ -77,23 +92,27 @@ class AccountController extends Controller
 
     function validateUserAcc($userId, $otp){
 
-        $user = DB::table('otps')
-            ->where('otp', $otp)
-            ->where('user_id', $userId)
-            ->where('type', 'activation')
-            ->where('otp_status', '0')
-            ->get();
-        if($user->count()==1){
-            DB::table('otps')
+        DB::transaction(function($userId, $otp) {
+
+            $user = DB::table('otps')
                 ->where('otp', $otp)
                 ->where('user_id', $userId)
-                ->update(['otp_status' => "1"]);
+                ->where('type', 'activation')
+                ->where('otp_status', '0')
+                ->get();
+            if($user->count()==1){
+                DB::table('otps')
+                    ->where('otp', $otp)
+                    ->where('user_id', $userId)
+                    ->update(['otp_status' => "1"]);
 
-            DB::table('users')
-                ->where('id', $userId)
-                ->update(['user_status' => "1", 'email_verified_at' =>date('Y-m-d H:i:s')]);
+                DB::table('users')
+                    ->where('id', $userId)
+                    ->update(['user_status' => "1", 'email_verified_at' =>date('Y-m-d H:i:s')]);
+            }
+        });
 
-        }
+        return ["res"=>"1"];
 
     }
 }
