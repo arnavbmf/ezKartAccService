@@ -23,13 +23,17 @@ Route::get('/', function () {
 
 Route::post('/createUser', [AccountController::class, 'createUser']);
 
-Route::post('/deleteUser', [AccountController::class, 'deleteUser']);
 
-Route::post('/updateUser', [AccountController::class, 'updateUser']);
 
 Route::get('/fetchUser', [AccountController::class, 'fetchUser']);
 
 Route::get('/fetchAllUsers', [AccountController::class, 'fetchAllUser']);
+
+//Route::prefix('admin')->middleware('auth')->group(funcion(){
+//    Route::post('/createRole', [AccountController::class, 'createRole']);
+//
+//});
+
 
 Route::get('/verifyEmail/{userid}/{otp}', function ($userid, $otp) {
 
@@ -41,6 +45,10 @@ Route::get('/verifyEmail/{userid}/{otp}', function ($userid, $otp) {
 Route::group(['middleware'=>'api', 'prefix'=>'auth'], function ($router){
     Route::post('/register', [AccountController::class, 'createUser']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/logout', [AuthController::class, 'logout']);
+    Route::get('/loggedInUser', [AuthController::class, 'loggedInUser']);
+    Route::post('/deleteUser', [AccountController::class, 'deleteUser']);
+    Route::post('/updateUser', [AccountController::class, 'updateUser']);
 
 });
 

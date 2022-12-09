@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Services\Login;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -41,4 +40,20 @@ class AuthController extends Controller
         ]);
 
     }
+
+    function logout(){
+        auth()->logout();
+        return response()->json([
+            'message' =>'logged out!'
+        ]);
+    }
+
+    function loggedInUser(){
+
+        return response()->json([
+            'user' => auth()->user()
+        ]);
+    }
+
+
 }
