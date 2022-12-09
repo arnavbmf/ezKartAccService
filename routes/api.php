@@ -26,3 +26,11 @@ Route::group(['middleware'=>'api', 'prefix'=>'auth'], function ($router){
     Route::get('/login', [AuthController::class, 'login']);
 
 });
+
+
+Route::group(['middleware' => ['cors', 'json.response']], function () {
+    Route::post('/login', 'Auth\ApiAuthController@login')->name('login.api');
+    Route::post('/register','Auth\ApiAuthController@register')->name('register.api');
+    Route::post('/logout', 'Auth\ApiAuthController@logout')->name('logout.api');
+
+});
