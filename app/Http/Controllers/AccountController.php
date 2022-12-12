@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Role;
 use App\Services\OtpGeneration;
 use Bschmitt\Amqp\Facades\Amqp;
 use Illuminate\Support\Facades\DB;
@@ -118,15 +117,5 @@ class AccountController extends Controller
 
     }
 
-    function createRole(Request $request){
 
-        $role = new Role();
-        $role->role = $request->role;
-        $role->save();
-
-        return response()->json([
-            'message' => 'role added'
-        ], 201);
-
-    }
 }
