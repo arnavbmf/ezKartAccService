@@ -52,6 +52,27 @@ Route::group(['middleware'=>'api', 'prefix'=>'auth'], function ($router){
 
 });
 
+// used by seller
+Route::group(['middleware'=>'seller'], function ($router){
+    Route::post('/createOrUpdateProduct', [App\Http\Controllers\ProductController::class, "createOrUpdateProduct"]);
+    Route::get('/listProducts', [App\Http\Controllers\ProductController::class, "listProducts"]);
+    Route::delete('/deleteProduct/{productId}', [App\Http\Controllers\ProductController::class, "deleteProduct"]);
+});
+
+// used by customer
+Route::group(['middleware'=>'customer'], function ($router){
+    Route::post('/addToCart', [App\Http\Controllers\CartController::class, "addToCart"]);
+    Route::post('/updateProductQuantityInCart', [App\Http\Controllers\CartController::class, "updateProductQuantityInCart"]);
+    Route::delete('/emptyCart/{userId}', [App\Http\Controllers\CartController::class, "emptyCart"]);
+    Route::get('/getCart/{userId}', [App\Http\Controllers\CartController::class, "getCart"]);
+});
+
+// will be used by both customer and seller
+Route::get('/getProduct/{productId}', [App\Http\Controllers\ProductController::class, "getProduct"]);
+
+
+
+
 
 
 
