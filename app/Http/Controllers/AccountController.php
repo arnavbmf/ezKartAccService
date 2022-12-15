@@ -45,9 +45,13 @@ class AccountController extends Controller
         if($user){
             $otpGeneration = new OtpGeneration();
             $opt = $otpGeneration->generateOtp($user->id);
-            $message = array('user' => $user->id,
+            $message = array(
+                'user' => $user->id,
                 'otp' =>$opt,
-                'email' =>$request->input('email'));
+                'email' =>$request->input('email'),
+                'mail_use' => "new_user_notfication",
+                'subject' => "New User OTP Notification"
+            );
             Amqp::publish('ezKartOtpVerification', json_encode($message), ['queue' => 'ezKartOtpVerification']);
 
             return response()->json([
