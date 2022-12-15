@@ -4,10 +4,18 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\User;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use App\Services\OtpGeneration;
+use Illuminate\Support\Facades\Redis;
+use Bschmitt\Amqp\Facades\Amqp;
+
+
+
+
 
 class ApiAuthController extends Controller
 {
@@ -15,7 +23,7 @@ class ApiAuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:6',
             'role' =>'required'
         ]);
         if ($validator->fails())
@@ -25,15 +33,29 @@ class ApiAuthController extends Controller
         $request['password']=Hash::make($request['password']);
         $request['remember_token'] = Str::random(10);
         $user = User::create($request->toArray());
-        $token = $user->createToken('Laravel Password Grant Client')->accessToken;
-        $response = ['token' => $token];
-        return response($response, 200);
+
+        if($user){
+            $otpGeneration = new OtpGeneration();
+            $opt = $otpGeneration->generateOtp($user->id);
+            $message = array('user' => $user->id,
+                'otp' =>$opt,
+                'email' =>$request->input('email'));
+            Amqp::publish('ezKartOtpVerification', json_encode($message), ['queue' => 'ezKartOtpVerification']);
+
+            return response()->json([
+                'message' =>'user successfully created',
+                'user' => $user
+            ], 200);
+        }
+//        $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+//        $response = ['token' => $token];
+//        return response($response, 200);
     }
 
     public function login (Request $request) {
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|max:255',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:6',
         ]);
         if ($validator->fails())
         {
@@ -42,7 +64,9 @@ class ApiAuthController extends Controller
         $user = User::where('email', $request->email)->first();
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
-                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+                $token = $user->createToken('Laravel Password Grant Client')->accessToken['token'];
+                Redis::set('token', $user->role);
+
                 $response = ['token' => $token];
                 return response($response, 200);
             } else {
@@ -62,11 +86,5 @@ class ApiAuthController extends Controller
         return response($response, 200);
     }
 
-    function loggedInUser(){
-
-        return response()->json([
-            'user' => auth()->user()
-        ]);
-    }
 
 }

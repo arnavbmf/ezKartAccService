@@ -56,10 +56,27 @@ services:
     networks:
     - internal-network
 
+
+  redis-master:
+    image: redis:6.2-alpine
+    ports:
+    - 6370:6379
+    environment:
+    - REDIS_REPLICATION_MODE=master
+    - REDIS_PASSWORD=${DB_PASSWORD}
+    volumes:
+    - cache:/data
+    networks:
+    - internal-network
+
+
 volumes:
   myvolume:
+    driver: local
+  cache:
     driver: local
 
 networks:
   internal-network:
     driver: bridge
+

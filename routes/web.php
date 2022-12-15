@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\ApiAuthController;
+
 
 
 /*
@@ -21,13 +23,13 @@ Route::get('/', function () {
 //    return "hi";
 });
 
-Route::post('/createUser', [AccountController::class, 'createUser']);
+//Route::post('/createUser', [AccountController::class, 'createUser']);
 
 
 
 Route::get('/fetchUser', [AccountController::class, 'fetchUser']);
 
-Route::get('/fetchAllUsers', [AccountController::class, 'fetchAllUser']);
+//Route::get('/fetchAllUsers', [AccountController::class, 'fetchAllUser']);
 
 //Route::prefix('admin')->middleware('auth')->group(funcion(){
 //    Route::post('/createRole', [AccountController::class, 'createRole']);
@@ -43,12 +45,12 @@ Route::get('/verifyEmail/{userid}/{otp}', function ($userid, $otp) {
 
 
 Route::group(['middleware'=>'api', 'prefix'=>'auth'], function ($router){
-    Route::post('/register', [AccountController::class, 'createUser']);
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::get('/logout', [AuthController::class, 'logout']);
-    Route::get('/loggedInUser', [AuthController::class, 'loggedInUser']);
-    Route::post('/deleteUser', [AccountController::class, 'deleteUser']);
-    Route::post('/updateUser', [AccountController::class, 'updateUser']);
+    Route::post('/register', [ApiAuthController::class, 'register']);
+    Route::post('/login', [ApiAuthController::class, 'login']);
+    Route::get('/logout', [ApiAuthController::class, 'logout']);
+//    Route::get('/loggedInUser', [AuthController::class, 'loggedInUser']);
+//    Route::post('/deleteUser', [AccountController::class, 'deleteUser']);
+//    Route::post('/updateUser', [AccountController::class, 'updateUser']);
 
 });
 

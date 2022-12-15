@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redis;
+
 
 
 class AdminAuth
@@ -18,8 +20,13 @@ class AdminAuth
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::guard('api')->check() && $request->user()->role == 1) {
-            return $next($request);
+
+        if (Auth::guard('api')->check()) {
+            if(Redis::get($request->header('Authorization'))){
+                return $next($request);
+            }
+            if($request->user()->role == 1)
+                return $next($request);
         } else {
             $message = ["message" => "Permission Denied"];
             return response($message, 401);

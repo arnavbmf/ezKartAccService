@@ -117,5 +117,17 @@ class AccountController extends Controller
 
     }
 
+    function fetchUser(Request $request){
+
+        $user = DB::table('users')
+            ->where('id', $request->input('id'))
+            ->get();
+
+        return $user;
+
+
+
+    }
+
 
 }
