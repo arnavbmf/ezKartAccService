@@ -23,50 +23,50 @@ class AccountController extends Controller
     }
 
 
-    function createUser(Request $request){
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email|string',
-            'password' => 'required|string',
-            'role' => 'required',
-
-        ]);
-
-        if($validator->fails()){
-            return response()->json($validator->error()->toJson(), 422);
-        }
-
-        $user = User::create(array_merge(
-            $validator->validated(),
-            ['password'=>bcrypt($request->input('password'))]
-        ));
-
-        if($user){
-            $otpGeneration = new OtpGeneration();
-            $opt = $otpGeneration->generateOtp($user->id);
-            $message = array(
-                'user' => $user->id,
-                'otp' =>$opt,
-                'email' =>$request->input('email'),
-                'mail_use' => "new_user_notfication",
-                'subject' => "New User OTP Notification"
-            );
-            Amqp::publish('ezKartOtpVerification', json_encode($message), ['queue' => 'ezKartOtpVerification']);
-
-            return response()->json([
-                'message' =>'user successfully created',
-                'user' => $user
-            ], 200);
-        }
-
-        return response()->json([
-            'message' =>'Error! User not created',
-                 'user' => $user
-            ], 500);
-
-
-    }
+//    function createUser(Request $request){
+//
+//        $validator = Validator::make($request->all(), [
+//            'name' => 'required',
+//            'email' => 'required|email|string',
+//            'password' => 'required|string',
+//            'role' => 'required',
+//
+//        ]);
+//
+//        if($validator->fails()){
+//            return response()->json($validator->error()->toJson(), 422);
+//        }
+//
+//        $user = User::create(array_merge(
+//            $validator->validated(),
+//            ['password'=>bcrypt($request->input('password'))]
+//        ));
+//
+//        if($user){
+//            $otpGeneration = new OtpGeneration();
+//            $opt = $otpGeneration->generateOtp($user->id);
+//            $message = array(
+//                'user' => $user->id,
+//                'otp' =>$opt,
+//                'email' =>$request->input('email'),
+//                'mail_use' => "new_user_notfication",
+//                'subject' => "New User OTP Notification"
+//            );
+//            Amqp::publish('ezKartOtpVerification', json_encode($message), ['queue' => 'ezKartOtpVerification']);
+//
+//            return response()->json([
+//                'message' =>'user successfully created',
+//                'user' => $user
+//            ], 200);
+//        }
+//
+//        return response()->json([
+//            'message' =>'Error! User not created',
+//                 'user' => $user
+//            ], 500);
+//
+//
+//    }
 
     function removeUser(Request $request){
         $id = $request->input('id');
@@ -89,11 +89,11 @@ class AccountController extends Controller
 
     }
 
-    function passwordReset(Request $request){
-
-        $id = $request->input('id');
-
-    }
+//    function passwordReset(Request $request){
+//
+//        $id = $request->input('id');
+//
+//    }
 
     function validateUserAcc($userId, $otp){
 
@@ -128,8 +128,6 @@ class AccountController extends Controller
             ->get();
 
         return $user;
-
-
 
     }
 
