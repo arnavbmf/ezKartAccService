@@ -125,7 +125,7 @@ class AccountController extends Controller
 
         $user = DB::table('users')
             ->where('id', $request->input('id'))
-            ->get();
+            ->first();
 
         return $user;
 
