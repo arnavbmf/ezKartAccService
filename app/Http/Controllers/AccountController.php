@@ -10,7 +10,7 @@ use App\Services\OtpGeneration;
 use Bschmitt\Amqp\Facades\Amqp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -122,12 +122,10 @@ class AccountController extends Controller
     }
 
     function fetchUser(Request $request){
-
-        $user = DB::table('users')
-            ->where('id', $request->input('id'))
-            ->first();
-
-        return $user;
+        $user = Auth::user();
+        $data['success'] = 1;
+        $data['user'] = $user;
+        return response()->json($data, '200');
 
     }
 

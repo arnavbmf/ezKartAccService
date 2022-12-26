@@ -1,4 +1,4 @@
-FROM php:8.0.2-apache
+FROM php:8.1.1-apache
 
 USER root
 

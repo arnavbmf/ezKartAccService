@@ -44,15 +44,15 @@ Route::get('/verifyEmail/{userid}/{otp}', function ($userid, $otp) {
 });
 
 
-Route::group(['middleware'=>'api', 'prefix'=>'auth'], function ($router){
-    Route::post('/register', [ApiAuthController::class, 'register']);
-    Route::post('/login', [ApiAuthController::class, 'login']);
-    Route::get('/logout', [ApiAuthController::class, 'logout']);
-//    Route::get('/loggedInUser', [AuthController::class, 'loggedInUser']);
-//    Route::post('/deleteUser', [AccountController::class, 'deleteUser']);
-//    Route::post('/updateUser', [AccountController::class, 'updateUser']);
+// Route::group(['middleware'=>'api', 'prefix'=>'auth'], function ($router){
+//     Route::post('/register', [ApiAuthController::class, 'register']);
+//     Route::post('/login', [ApiAuthController::class, 'login']);
+//     Route::get('/logout', [ApiAuthController::class, 'logout']);
+// //    Route::get('/loggedInUser', [AuthController::class, 'loggedInUser']);
+// //    Route::post('/deleteUser', [AccountController::class, 'deleteUser']);
+// //    Route::post('/updateUser', [AccountController::class, 'updateUser']);
 
-});
+// });
 
 // used by seller
 Route::group(['middleware'=>'seller'], function ($router){

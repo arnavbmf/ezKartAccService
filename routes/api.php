@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\ApiAuthController;
 use App\Http\Controllers\AccountController;
 
 
@@ -16,21 +17,17 @@ use App\Http\Controllers\AccountController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::group(['middleware'=>'api', 'prefix'=>'auth'], function ($router){
-    Route::post('/register', [AccountController::class, 'createUser']);
-    Route::get('/login', [AuthController::class, 'login']);
-
-});
+Route::post('register', 'App\Http\Controllers\Auth\ApiAuthController@register');
+Route::post('login', 'App\Http\Controllers\Auth\ApiAuthController@login');
 
 
-Route::group(['middleware' => ['cors', 'json.response']], function () {
-    Route::post('/login', 'Auth\ApiAuthController@login')->name('login.api');
-    Route::post('/register','Auth\ApiAuthController@register')->name('register.api');
-    Route::post('/logout', 'Auth\ApiAuthController@logout')->name('logout.api');
+Route::middleware('auth:api')->group(function () {
+    Route::post('checkAccess', 'App\Http\Controllers\Auth\ApiAuthController@checkAccess');
+    Route::get('fetchUser', 'App\Http\Controllers\AccountController@fetchUser');
+    Route::post('logout', 'App\Http\Controllers\Auth\ApiAuthController@logout');
 
+    
+    Route::post('createOrUpdateProduct', 'App\Http\Controllers\ThirdPartyApiController@createOrUpdateProduct')->middleware("api.seller");
+    Route::get('listProducts', 'App\Http\Controllers\ThirdPartyApiController@listProducts')->middleware("api.seller");
+    Route::get('getProduct/{productId}', 'App\Http\Controllers\ThirdPartyApiController@getProduct')->middleware("api.seller");
 });

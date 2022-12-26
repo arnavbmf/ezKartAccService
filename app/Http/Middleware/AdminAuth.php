@@ -22,10 +22,10 @@ class AdminAuth
     {
 
         if (Auth::guard('api')->check()) {
-            if(Redis::get($request->header('Authorization'))){
-                return $next($request);
-            }
-            if($request->user()->role == 1)
+            // if(Redis::get($request->header('Authorization'))){
+                // return $next($request);
+            // }
+            if(Auth::user()->role == 1)
                 return $next($request);
         } else {
             $message = ["message" => "Permission Denied"];

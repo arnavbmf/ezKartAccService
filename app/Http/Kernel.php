@@ -71,7 +71,8 @@ class Kernel extends HttpKernel
         'cors' => \App\Http\Middleware\Cors::class,
         'api.admin' => \App\Http\Middleware\AdminAuth::class,
         'api.superAdmin' => \App\Http\Middleware\SuperAdminAuth::class,
-
+        'api.customerAuth' => \App\Http\Middleware\CustomerAuth::class,
+        'api.seller' => \App\Http\Middleware\SellerAuth::class,
 
     ];
 }

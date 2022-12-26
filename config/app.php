@@ -163,7 +163,6 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-        Laravel\Passport\PassportServiceProvider::class,
 
 
         /*
@@ -180,6 +179,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Bschmitt\Amqp\AmqpServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        Laravel\Passport\PassportServiceProvider::class,
 
     ],
 
